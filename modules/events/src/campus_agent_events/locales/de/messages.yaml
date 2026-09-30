@@ -1,0 +1,39 @@
+tools:
+  list_events:
+    description: >-
+      Listet kommende Veranstaltungen des Vereins. Passt für Fragen nach Terminen und
+      Events; nicht für Teilnehmerlisten.
+    params:
+      start: Optional erst ab diesem Datum (JJJJ-MM-TT).
+      limit: Höchstzahl der Veranstaltungen.
+  register_for_event:
+    description: >-
+      Meldet die Person selbst zu einer Veranstaltung an. Passt nur für die eigene
+      Anmeldung, nicht für andere Personen.
+    params:
+      event_id: ID der Veranstaltung aus list_events.
+  cancel_registration:
+    description: >-
+      Nimmt die eigene Anmeldung zu einer Veranstaltung zurück. Nur für eigene Anmeldungen.
+    params:
+      event_id: ID der Veranstaltung aus list_events.
+  create_event:
+    description: >-
+      Legt eine neue Veranstaltung an. Nur für den Vorstand; nicht zum Ändern bestehender
+      Veranstaltungen.
+    params:
+      title: Titel der Veranstaltung.
+      starts_at: Beginn mit Datum, Uhrzeit und Zeitzone.
+      ends_at: Optional Ende mit Datum, Uhrzeit und Zeitzone.
+      location: Optional der Ort.
+      description: Optional eine kurze Beschreibung.
+      capacity: Optional die Höchstzahl der Teilnehmenden.
+  list_registrations:
+    description: >-
+      Zeigt die Teilnehmerliste einer Veranstaltung. Nur für den Vorstand.
+    params:
+      event_id: ID der Veranstaltung aus list_events.
+
+prompt:
+  events: >-
+    An- und Abmeldungen zu Veranstaltungen gelten immer nur für die Person selbst.

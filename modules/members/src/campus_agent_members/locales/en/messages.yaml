@@ -1,0 +1,32 @@
+tools:
+  get_my_profile:
+    description: >-
+      Shows your own master data (name, email, team, joining date). Use it when someone wants
+      to see their own data; not for other members' data.
+    params: {}
+  create_change_draft:
+    description: >-
+      Prepares a change request for your own master data as a draft for the board to
+      approve. Use it when your data has changed; it does not change anything directly.
+    params:
+      field: Which field should change.
+      new_value: The new value.
+  search_members:
+    description: >-
+      Searches members by name, email or team. Board only; not for your own data.
+    params:
+      query: Search term, at least two characters.
+      active_only: Show active members only.
+  update_member:
+    description: >-
+      Changes a member's master data directly. Board only, and only when the member has not
+      filed a change request; otherwise approve that application.
+    params:
+      member_id: ID of the member from search_members.
+      field: Which field should change.
+      new_value: The new value.
+
+prompt:
+  members: >-
+    Members never change their own master data directly but through a change request that
+    the board approves.

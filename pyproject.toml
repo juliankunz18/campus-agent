@@ -62,6 +62,7 @@ known-first-party = [
     "campus_agent_mcp",
     "campus_agent_cli",
     "evals",
+    "tests",
 ]
 
 [tool.pyright]

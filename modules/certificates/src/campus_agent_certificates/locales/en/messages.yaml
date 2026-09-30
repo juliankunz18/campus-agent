@@ -1,0 +1,35 @@
+tools:
+  list_my_activities:
+    description: >-
+      Lists your own recorded activities, optionally for a period. Use it when someone wants
+      to see what is recorded for them; not for other people's activities.
+    params:
+      start: Optional earliest date (YYYY-MM-DD).
+      end: Optional latest date (YYYY-MM-DD).
+  create_certificate_draft:
+    description: >-
+      Creates a draft engagement certificate from your own confirmed activities. Use it when
+      a member wants a certificate; it becomes binding only after submission and approval.
+    params:
+      start: Start of the period (YYYY-MM-DD).
+      end: End of the period (YYYY-MM-DD).
+      purpose: Optional purpose, e.g. a job or scholarship application.
+  list_team_activities:
+    description: >-
+      Lists the activities in your own team. Team leads and board only; not for your own
+      activities.
+    params:
+      start: Optional earliest date (YYYY-MM-DD).
+      end: Optional latest date (YYYY-MM-DD).
+      only_unconfirmed: Show only activities that are not confirmed yet.
+  confirm_activity:
+    description: >-
+      Confirms an activity in your own team so that it appears in certificates. Team leads
+      and board only.
+    params:
+      activity_id: ID of the activity from list_team_activities.
+
+prompt:
+  certificates: >-
+    Engagement certificates are built from confirmed activities. Never write their content
+    yourself; the PDF is generated from a template once the board approves.

@@ -1,0 +1,33 @@
+tools:
+  get_my_profile:
+    description: >-
+      Zeigt die eigenen Stammdaten (Name, E-Mail, Ressort, Eintritt). Passt, wenn jemand
+      seine eigenen Daten sehen will; nicht für Daten anderer Mitglieder.
+    params: {}
+  create_change_draft:
+    description: >-
+      Bereitet eine Änderungsmeldung für die eigenen Stammdaten als Entwurf vor, den der
+      Vorstand freigibt. Passt, wenn sich eigene Daten geändert haben; ändert nichts direkt.
+    params:
+      field: Welches Feld sich ändern soll.
+      new_value: Der neue Wert.
+  search_members:
+    description: >-
+      Sucht Mitglieder nach Name, E-Mail oder Ressort. Nur für den Vorstand; nicht für die
+      eigenen Daten.
+    params:
+      query: Suchbegriff, mindestens zwei Zeichen.
+      active_only: Nur aktive Mitglieder anzeigen.
+  update_member:
+    description: >-
+      Ändert Stammdaten eines Mitglieds direkt. Nur für den Vorstand und nur, wenn keine
+      Änderungsmeldung des Mitglieds vorliegt; sonst den Antrag freigeben.
+    params:
+      member_id: ID des Mitglieds aus search_members.
+      field: Welches Feld sich ändern soll.
+      new_value: Der neue Wert.
+
+prompt:
+  members: >-
+    Eigene Stammdaten ändern Mitglieder nie direkt, sondern über eine Änderungsmeldung, die
+    der Vorstand freigibt.

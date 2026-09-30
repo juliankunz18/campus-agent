@@ -12,6 +12,9 @@ from pydantic import Field
 
 from campus_agent_core.domain.applications import ApplicationStatus
 from campus_agent_core.ports.module import (
+    ColumnType,
+    ListColumn,
+    ListSpec,
     ModuleManifest,
     ToolClass,
     ToolContext,
@@ -24,6 +27,40 @@ MEMBER = "member"
 BOARD = "board"
 
 type ApplicationKind = str
+
+# One list for every kind of application, distinguished by "Typ". Only the repository
+# adapter in integrations/sharepoint knows these names.
+APPLICATIONS_LIST = ListSpec(
+    name="Antraege",
+    columns=(
+        ListColumn(name="AntragId", type=ColumnType.TEXT, required=True, indexed=True, unique=True),
+        ListColumn(name="Typ", type=ColumnType.TEXT, required=True, indexed=True),
+        ListColumn(
+            name="Status",
+            type=ColumnType.CHOICE,
+            required=True,
+            indexed=True,
+            choices=tuple(status.value for status in ApplicationStatus),
+        ),
+        ListColumn(name="AntragstellerEntraId", type=ColumnType.TEXT, required=True, indexed=True),
+        ListColumn(name="FreigeberEntraId", type=ColumnType.TEXT),
+        ListColumn(name="ErstelltAm", type=ColumnType.DATETIME, required=True),
+        ListColumn(name="EingereichtAm", type=ColumnType.DATETIME),
+        ListColumn(name="EntschiedenAm", type=ColumnType.DATETIME),
+        ListColumn(name="Rueckfrage", type=ColumnType.NOTE),
+        ListColumn(name="RueckfrageAm", type=ColumnType.DATETIME),
+        ListColumn(name="RueckfrageAntwort", type=ColumnType.NOTE),
+        ListColumn(name="Begruendung", type=ColumnType.NOTE),
+        # Certificate applications
+        ListColumn(name="Von", type=ColumnType.DATE),
+        ListColumn(name="Bis", type=ColumnType.DATE),
+        ListColumn(name="Zweck", type=ColumnType.TEXT),
+        ListColumn(name="AktivitaetIds", type=ColumnType.NOTE),
+        # Data change applications
+        ListColumn(name="Feld", type=ColumnType.TEXT),
+        ListColumn(name="NeuerWert", type=ColumnType.TEXT),
+    ),
+)
 
 
 class ListMyApplicationsInput(ToolInput):
@@ -113,7 +150,7 @@ manifest = ModuleManifest(
     required_roles=(MEMBER, BOARD),
     locale_package="campus_agent_core",
     prompt_fragments=("prompt.applications",),
-    lists=(),  # the Antraege list is declared by the modules that create applications
+    lists=(APPLICATIONS_LIST,),
     tools=(
         ToolSpec(
             name="list_my_applications",

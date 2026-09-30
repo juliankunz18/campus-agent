@@ -1,4 +1,5 @@
 import textwrap
+from datetime import UTC, datetime
 from importlib.metadata import EntryPoint, entry_points
 from pathlib import Path
 
@@ -6,6 +7,7 @@ import pytest
 from pydantic import ConfigDict, ValidationError
 
 from campus_agent_core.config import CampusAgentConfig
+from campus_agent_core.domain.user import UserContext
 from campus_agent_core.errors import ForbiddenError, NotFoundError
 from campus_agent_core.i18n import Catalog, load_catalog
 from campus_agent_core.modules import (
@@ -395,3 +397,13 @@ class TestRegistry:
         english = ToolRegistry(modules, config.role_hierarchy(), language="en")
 
         assert english.get("approve_application").description.startswith("Approves")
+
+
+@pytest.mark.parametrize("spec", core_manifest.tools, ids=lambda spec: spec.name)
+async def test_core_handlers_are_stubs(spec: ToolSpec):
+    context = ToolContext(
+        user=UserContext(user_id="user-1", role="board"), now=datetime(2026, 10, 1, tzinfo=UTC)
+    )
+
+    with pytest.raises(NotImplementedError, match=spec.name):
+        await spec.handler(context, spec.input_model.model_construct())

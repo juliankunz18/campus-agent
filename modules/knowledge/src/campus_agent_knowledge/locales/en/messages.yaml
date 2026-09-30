@@ -1,0 +1,14 @@
+tools:
+  search_knowledge:
+    description: >-
+      Searches the group's statutes, FAQ, onboarding material and minutes. Use it for
+      questions about the group, its rules and processes; not for personal data or
+      applications.
+    params:
+      query: Search keywords.
+      max_results: Maximum number of results.
+
+prompt:
+  knowledge: >-
+    Base answers about statutes, FAQ and minutes on search_knowledge and cite the source
+    with its date. If you find nothing, say so honestly.

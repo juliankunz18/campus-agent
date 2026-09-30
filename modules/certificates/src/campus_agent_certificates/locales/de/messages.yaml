@@ -1,0 +1,36 @@
+tools:
+  list_my_activities:
+    description: >-
+      Listet die eigenen erfassten Aktivitäten, optional für einen Zeitraum. Passt, wenn
+      jemand sehen will, was für ihn eingetragen ist; nicht für Aktivitäten anderer.
+    params:
+      start: Optional frühestes Datum (JJJJ-MM-TT).
+      end: Optional spätestes Datum (JJJJ-MM-TT).
+  create_certificate_draft:
+    description: >-
+      Legt aus den eigenen bestätigten Aktivitäten einen Entwurf für eine
+      Engagementbescheinigung an. Passt, wenn ein Mitglied eine Bescheinigung möchte;
+      verbindlich wird sie erst nach Einreichen und Freigabe.
+    params:
+      start: Beginn des Zeitraums (JJJJ-MM-TT).
+      end: Ende des Zeitraums (JJJJ-MM-TT).
+      purpose: Optional der Zweck, z. B. Bewerbung oder Stipendium.
+  list_team_activities:
+    description: >-
+      Listet die Aktivitäten im eigenen Ressort. Nur für Ressortleitungen und den Vorstand;
+      nicht für die eigenen Aktivitäten.
+    params:
+      start: Optional frühestes Datum (JJJJ-MM-TT).
+      end: Optional spätestes Datum (JJJJ-MM-TT).
+      only_unconfirmed: Nur noch nicht bestätigte Aktivitäten zeigen.
+  confirm_activity:
+    description: >-
+      Bestätigt eine Aktivität im eigenen Ressort, damit sie in Bescheinigungen erscheint.
+      Nur für Ressortleitungen und den Vorstand.
+    params:
+      activity_id: ID der Aktivität aus list_team_activities.
+
+prompt:
+  certificates: >-
+    Engagementbescheinigungen entstehen aus bestätigten Aktivitäten. Formuliere ihren Inhalt
+    nie selbst; das PDF wird aus einer Vorlage erzeugt, sobald der Vorstand freigibt.

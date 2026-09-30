@@ -1,0 +1,38 @@
+tools:
+  list_events:
+    description: >-
+      Lists the group's upcoming events. Use it for questions about dates and events; not
+      for participant lists.
+    params:
+      start: Optionally only from this date (YYYY-MM-DD).
+      limit: Maximum number of events.
+  register_for_event:
+    description: >-
+      Registers the person themselves for an event. Only for your own registration, not for
+      other people.
+    params:
+      event_id: ID of the event from list_events.
+  cancel_registration:
+    description: >-
+      Withdraws your own registration for an event. Only for your own registrations.
+    params:
+      event_id: ID of the event from list_events.
+  create_event:
+    description: >-
+      Creates a new event. Board only; not for changing existing events.
+    params:
+      title: Title of the event.
+      starts_at: Start with date, time and time zone.
+      ends_at: Optional end with date, time and time zone.
+      location: Optional location.
+      description: Optional short description.
+      capacity: Optional maximum number of participants.
+  list_registrations:
+    description: >-
+      Shows the participant list of an event. Board only.
+    params:
+      event_id: ID of the event from list_events.
+
+prompt:
+  events: >-
+    Registrations and cancellations for events always apply to the person themselves only.

@@ -1,0 +1,13 @@
+tools:
+  search_knowledge:
+    description: >-
+      Durchsucht Satzung, FAQ, Onboarding-Unterlagen und Protokolle des Vereins. Passt für
+      Fragen zum Verein, zu Regeln und Abläufen; nicht für persönliche Daten oder Anträge.
+    params:
+      query: Suchbegriffe in Stichworten.
+      max_results: Höchstzahl der Fundstellen.
+
+prompt:
+  knowledge: >-
+    Antworten zu Satzung, FAQ und Protokollen stützt du auf search_knowledge und nennst die
+    Quelle mit Stand. Findest du nichts, sag das ehrlich.
