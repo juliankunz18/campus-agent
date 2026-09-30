@@ -1,0 +1,84 @@
+[project]
+name = "campus-agent-workspace"
+version = "0.1.0"
+description = "Workspace root for the campus-agent framework"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "campus-agent-core",
+    "campus-agent-integrations",
+    "campus-agent-members",
+    "campus-agent-certificates",
+    "campus-agent-knowledge",
+    "campus-agent-events",
+    "campus-agent-bot",
+    "campus-agent-mcp",
+    "campus-agent-cli",
+]
+
+[dependency-groups]
+dev = [
+    "pyright==1.1.414",
+    "pytest==9.1.1",
+    "pytest-asyncio==1.4.0",
+    "ruff==0.16.9",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["core", "integrations", "modules/*", "apps/*"]
+
+[tool.uv.sources]
+campus-agent-core = { workspace = true }
+campus-agent-integrations = { workspace = true }
+campus-agent-members = { workspace = true }
+campus-agent-certificates = { workspace = true }
+campus-agent-knowledge = { workspace = true }
+campus-agent-events = { workspace = true }
+campus-agent-bot = { workspace = true }
+campus-agent-mcp = { workspace = true }
+campus-agent-cli = { workspace = true }
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["infra"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "SIM", "RUF", "ASYNC", "PT", "C4", "PIE", "RET"]
+
+[tool.ruff.lint.isort]
+known-first-party = [
+    "campus_agent_core",
+    "campus_agent_integrations",
+    "campus_agent_members",
+    "campus_agent_certificates",
+    "campus_agent_knowledge",
+    "campus_agent_events",
+    "campus_agent_bot",
+    "campus_agent_mcp",
+    "campus_agent_cli",
+    "evals",
+]
+
+[tool.pyright]
+pythonVersion = "3.12"
+typeCheckingMode = "standard"
+include = ["core", "integrations", "modules", "apps", "evals", "tests"]
+exclude = ["**/.venv", "**/__pycache__", "**/build", "**/dist"]
+strict = ["core/src"]
+venvPath = "."
+venv = ".venv"
+
+[tool.pytest.ini_options]
+minversion = "9.0"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+pythonpath = ["."]
+testpaths = ["core/tests", "integrations/tests", "modules", "apps", "tests"]
+addopts = ["--import-mode=importlib", "--strict-markers"]
+markers = ["integration: needs a real dev tenant (deselected by default in CI)"]
+xfail_strict = true

@@ -1,0 +1,19 @@
+[project]
+name = "campus-agent-core"
+version = "0.1.0"
+description = "Core of campus-agent: ports, domain, configuration, module system and agent loop"
+license = "Apache-2.0"
+requires-python = ">=3.12,<3.13"
+authors = [{ name = "Julian Kunz and contributors" }]
+dependencies = [
+    "pydantic==2.13.5",
+    "pydantic-settings==2.15.0",
+    "pyyaml==6.0.3",
+]
+
+[project.entry-points."campus_agent.modules"]
+core = "campus_agent_core.modules.builtin:manifest"
+
+[build-system]
+requires = ["uv_build>=0.12.21,<0.13"]
+build-backend = "uv_build"

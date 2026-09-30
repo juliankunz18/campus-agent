@@ -1,0 +1,22 @@
+[project]
+name = "campus-agent-integrations"
+version = "0.1.0"
+description = "Adapters for Teams, SharePoint (Microsoft Graph) and Azure OpenAI, plus test fakes"
+license = "Apache-2.0"
+requires-python = ">=3.12,<3.13"
+authors = [{ name = "Julian Kunz and contributors" }]
+dependencies = [
+    "campus-agent-core",
+    "azure-data-tables==12.7.0",
+    "azure-identity==1.25.3",
+    "microsoft-agents-hosting-teams==1.7.0",
+    "msgraph-sdk==1.63.0",
+    "openai==3.22.1",
+]
+
+[tool.uv.sources]
+campus-agent-core = { workspace = true }
+
+[build-system]
+requires = ["uv_build>=0.12.21,<0.13"]
+build-backend = "uv_build"

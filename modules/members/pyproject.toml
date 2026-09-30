@@ -1,0 +1,20 @@
+[project]
+name = "campus-agent-members"
+version = "0.1.0"
+description = "campus-agent module: members"
+license = "Apache-2.0"
+requires-python = ">=3.12,<3.13"
+authors = [{ name = "Julian Kunz and contributors" }]
+dependencies = [
+    "campus-agent-core",
+]
+
+[project.entry-points."campus_agent.modules"]
+members = "campus_agent_members.manifest:manifest"
+
+[tool.uv.sources]
+campus-agent-core = { workspace = true }
+
+[build-system]
+requires = ["uv_build>=0.12.21,<0.13"]
+build-backend = "uv_build"
