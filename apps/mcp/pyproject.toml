@@ -8,6 +8,10 @@ authors = [{ name = "Julian Kunz and contributors" }]
 dependencies = [
     "campus-agent-core",
     "campus-agent-integrations",
+    "campus-agent-members",
+    "campus-agent-certificates",
+    "campus-agent-knowledge",
+    "campus-agent-events",
     "mcp==2.2.0",
     "uvicorn==0.54.0",
 ]
@@ -18,6 +22,10 @@ campus-agent-mcp = "campus_agent_mcp.__main__:main"
 [tool.uv.sources]
 campus-agent-core = { workspace = true }
 campus-agent-integrations = { workspace = true }
+campus-agent-members = { workspace = true }
+campus-agent-certificates = { workspace = true }
+campus-agent-knowledge = { workspace = true }
+campus-agent-events = { workspace = true }
 
 [build-system]
 requires = ["uv_build>=0.12.21,<0.13"]

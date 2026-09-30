@@ -164,8 +164,12 @@ version = "0.1.0"
 source = { editable = "apps/bot" }
 dependencies = [
     { name = "aiohttp" },
+    { name = "campus-agent-certificates" },
     { name = "campus-agent-core" },
+    { name = "campus-agent-events" },
     { name = "campus-agent-integrations" },
+    { name = "campus-agent-knowledge" },
+    { name = "campus-agent-members" },
     { name = "microsoft-agents-authentication-msal" },
     { name = "microsoft-agents-hosting-aiohttp" },
 ]
@@ -173,8 +177,12 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "aiohttp", specifier = "==3.14.3" },
+    { name = "campus-agent-certificates", editable = "modules/certificates" },
     { name = "campus-agent-core", editable = "core" },
+    { name = "campus-agent-events", editable = "modules/events" },
     { name = "campus-agent-integrations", editable = "integrations" },
+    { name = "campus-agent-knowledge", editable = "modules/knowledge" },
+    { name = "campus-agent-members", editable = "modules/members" },
     { name = "microsoft-agents-authentication-msal", specifier = "==1.7.0" },
     { name = "microsoft-agents-hosting-aiohttp", specifier = "==1.7.0" },
 ]
@@ -274,16 +282,24 @@ name = "campus-agent-mcp"
 version = "0.1.0"
 source = { editable = "apps/mcp" }
 dependencies = [
+    { name = "campus-agent-certificates" },
     { name = "campus-agent-core" },
+    { name = "campus-agent-events" },
     { name = "campus-agent-integrations" },
+    { name = "campus-agent-knowledge" },
+    { name = "campus-agent-members" },
     { name = "mcp" },
     { name = "uvicorn" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "campus-agent-certificates", editable = "modules/certificates" },
     { name = "campus-agent-core", editable = "core" },
+    { name = "campus-agent-events", editable = "modules/events" },
     { name = "campus-agent-integrations", editable = "integrations" },
+    { name = "campus-agent-knowledge", editable = "modules/knowledge" },
+    { name = "campus-agent-members", editable = "modules/members" },
     { name = "mcp", specifier = "==2.2.0" },
     { name = "uvicorn", specifier = "==0.54.0" },
 ]

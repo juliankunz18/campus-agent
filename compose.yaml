@@ -1,0 +1,60 @@
+# Local development with the fictional Musterverein: no Teams tenant, no real data.
+#   docker compose up --build
+# Bot: http://localhost:3978/healthz   MCP server: http://localhost:8000/mcp (MCP Inspector)
+# Values come from examples/musterverein/.env.example; put your own in .env (never commit it).
+
+name: campus-agent
+
+x-common-env: &common-env
+  env_file:
+    - path: examples/musterverein/.env.example
+      required: true
+    - path: .env
+      required: false
+
+services:
+  bot:
+    build:
+      context: .
+      dockerfile: apps/bot/Dockerfile
+    <<: *common-env
+    environment:
+      CAMPUS_AGENT_ENV: local
+      CAMPUS_AGENT_CONFIG: /config/campus-agent.yaml
+      MCP_URL: http://mcp:8000/mcp
+      TABLE_STORAGE_URL: http://azurite:10002/devstoreaccount1
+    volumes:
+      - ./examples/musterverein:/config:ro
+    ports:
+      - "127.0.0.1:3978:3978"
+    depends_on:
+      mcp:
+        condition: service_healthy
+      azurite:
+        condition: service_started
+
+  mcp:
+    build:
+      context: .
+      dockerfile: apps/mcp/Dockerfile
+    <<: *common-env
+    environment:
+      CAMPUS_AGENT_ENV: local
+      CAMPUS_AGENT_CONFIG: /config/campus-agent.yaml
+      MCP_ALLOWED_HOSTS: "mcp:8000,localhost:*,127.0.0.1:*"
+    volumes:
+      - ./examples/musterverein:/config:ro
+    ports:
+      # Published on localhost only, for the MCP Inspector. In Azure the ingress is internal.
+      - "127.0.0.1:8000:8000"
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite:3.37.0
+    command: ["azurite-table", "--tableHost", "0.0.0.0", "--tablePort", "10002", "--location", "/data"]
+    volumes:
+      - azurite-data:/data
+    ports:
+      - "127.0.0.1:10002:10002"
+
+volumes:
+  azurite-data:
