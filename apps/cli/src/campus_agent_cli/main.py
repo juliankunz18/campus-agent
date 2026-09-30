@@ -150,6 +150,9 @@ def doctor(
     )
     names = ", ".join(f"{m.name} {m.manifest.version}" for m in modules)
     typer.echo(f"{OK} modules: {names}")
+    slots = {slot: role for module in modules for slot, role in module.slot_roles.items()}
+    mapping = ", ".join(f"{slot}={role}" for slot, role in sorted(slots.items()))
+    typer.echo(f"{OK} role slots: {mapping}")
     typer.echo(f"{OK} tools and texts: {len(registry.all())} tools")
 
     failures += _check_template(loaded_config, config)

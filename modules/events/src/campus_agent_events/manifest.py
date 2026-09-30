@@ -5,11 +5,13 @@ from __future__ import annotations
 from pydantic import BaseModel, ConfigDict
 
 from campus_agent_core.ports import (
+    APPROVER_SLOT,
+    BASE_SLOT,
     ColumnType,
     ListColumn,
     ListSpec,
     ModuleManifest,
-    RoleRef,
+    RoleSlot,
     ToolClass,
     ToolSpec,
 )
@@ -19,10 +21,11 @@ from campus_agent_events import tools
 class EventsSettings(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    # TODO(events): tools use the fixed minimum roles of the tool catalog for now;
-    # decide whether organizer_role should override the role of create_event and
-    # list_registrations (see docs/adr/0011).
-    organizer_role: RoleRef = "board"
+    organizer_role: str | None = None
+    """Role that creates events and sees participant lists; defaults to the approver."""
+
+
+ORGANIZER = "organizer"
 
 
 EVENTS_LIST = ListSpec(
@@ -54,7 +57,7 @@ REGISTRATIONS_LIST = ListSpec(
 manifest = ModuleManifest(
     name="events",
     version="0.1.0",
-    required_roles=("member", "board"),
+    required_roles=(RoleSlot(name=ORGANIZER, inherits=APPROVER_SLOT, setting="organizer_role"),),
     locale_package="campus_agent_events",
     prompt_fragments=("prompt.events",),
     lists=(EVENTS_LIST, REGISTRATIONS_LIST),
@@ -63,35 +66,35 @@ manifest = ModuleManifest(
         ToolSpec(
             name="list_events",
             tool_class=ToolClass.READ,
-            min_role="member",
+            min_role=BASE_SLOT,
             input_model=tools.ListEventsInput,
             handler=tools.list_events,
         ),
         ToolSpec(
             name="register_for_event",
             tool_class=ToolClass.COMMIT,
-            min_role="member",
+            min_role=BASE_SLOT,
             input_model=tools.EventRef,
             handler=tools.register_for_event,
         ),
         ToolSpec(
             name="cancel_registration",
             tool_class=ToolClass.COMMIT,
-            min_role="member",
+            min_role=BASE_SLOT,
             input_model=tools.EventRef,
             handler=tools.cancel_registration,
         ),
         ToolSpec(
             name="create_event",
             tool_class=ToolClass.COMMIT,
-            min_role="board",
+            min_role=ORGANIZER,
             input_model=tools.CreateEventInput,
             handler=tools.create_event,
         ),
         ToolSpec(
             name="list_registrations",
             tool_class=ToolClass.READ,
-            min_role="board",
+            min_role=ORGANIZER,
             input_model=tools.EventRef,
             handler=tools.list_registrations,
         ),

@@ -8,14 +8,18 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from pydantic import Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from campus_agent_core.domain.applications import ApplicationStatus
 from campus_agent_core.ports.module import (
+    APPROVER_SLOT,
+    BASE_SLOT,
     ColumnType,
+    DefaultRole,
     ListColumn,
     ListSpec,
     ModuleManifest,
+    RoleSlot,
     ToolClass,
     ToolContext,
     ToolInput,
@@ -23,10 +27,16 @@ from campus_agent_core.ports.module import (
     ToolSpec,
 )
 
-MEMBER = "member"
-BOARD = "board"
-
 type ApplicationKind = str
+
+
+class CoreSettings(BaseModel):
+    """Settings of the core, taken from the top-level ``applications`` section."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    approver_role: str | None = None
+
 
 # One list for every kind of application, distinguished by "Typ". Only the repository
 # adapter in integrations/sharepoint knows these names.
@@ -147,7 +157,11 @@ async def approve_all_open(context: ToolContext, params: ApproveAllOpenInput) ->
 manifest = ModuleManifest(
     name="core",
     version="0.1.0",
-    required_roles=(MEMBER, BOARD),
+    required_roles=(
+        RoleSlot(name=BASE_SLOT, default=DefaultRole.LOWEST, privileged=False),
+        RoleSlot(name=APPROVER_SLOT, default=DefaultRole.HIGHEST, setting="approver_role"),
+    ),
+    config_model=CoreSettings,
     locale_package="campus_agent_core",
     prompt_fragments=("prompt.applications",),
     lists=(APPLICATIONS_LIST,),
@@ -155,70 +169,70 @@ manifest = ModuleManifest(
         ToolSpec(
             name="list_my_applications",
             tool_class=ToolClass.READ,
-            min_role=MEMBER,
+            min_role=BASE_SLOT,
             input_model=ListMyApplicationsInput,
             handler=list_my_applications,
         ),
         ToolSpec(
             name="submit_application",
             tool_class=ToolClass.COMMIT,
-            min_role=MEMBER,
+            min_role=BASE_SLOT,
             input_model=ApplicationRef,
             handler=submit_application,
         ),
         ToolSpec(
             name="discard_draft",
             tool_class=ToolClass.COMMIT,
-            min_role=MEMBER,
+            min_role=BASE_SLOT,
             input_model=ApplicationRef,
             handler=discard_draft,
         ),
         ToolSpec(
             name="answer_clarification",
             tool_class=ToolClass.COMMIT,
-            min_role=MEMBER,
+            min_role=BASE_SLOT,
             input_model=AnswerClarificationInput,
             handler=answer_clarification,
         ),
         ToolSpec(
             name="list_open_applications",
             tool_class=ToolClass.READ,
-            min_role=BOARD,
+            min_role=APPROVER_SLOT,
             input_model=ListOpenApplicationsInput,
             handler=list_open_applications,
         ),
         ToolSpec(
             name="get_application",
             tool_class=ToolClass.READ,
-            min_role=BOARD,
+            min_role=APPROVER_SLOT,
             input_model=ApplicationRef,
             handler=get_application,
         ),
         ToolSpec(
             name="approve_application",
             tool_class=ToolClass.COMMIT,
-            min_role=BOARD,
+            min_role=APPROVER_SLOT,
             input_model=ApplicationRef,
             handler=approve_application,
         ),
         ToolSpec(
             name="reject_application",
             tool_class=ToolClass.COMMIT,
-            min_role=BOARD,
+            min_role=APPROVER_SLOT,
             input_model=RejectApplicationInput,
             handler=reject_application,
         ),
         ToolSpec(
             name="request_clarification",
             tool_class=ToolClass.COMMIT,
-            min_role=BOARD,
+            min_role=APPROVER_SLOT,
             input_model=RequestClarificationInput,
             handler=request_clarification,
         ),
         ToolSpec(
             name="approve_all_open",
             tool_class=ToolClass.COMMIT,
-            min_role=BOARD,
+            min_role=APPROVER_SLOT,
             input_model=ApproveAllOpenInput,
             handler=approve_all_open,
         ),

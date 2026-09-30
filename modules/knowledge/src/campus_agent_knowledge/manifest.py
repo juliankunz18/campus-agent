@@ -5,6 +5,7 @@ from __future__ import annotations
 from pydantic import BaseModel, ConfigDict, Field
 
 from campus_agent_core.ports import (
+    BASE_SLOT,
     ColumnType,
     ListColumn,
     ListKind,
@@ -39,7 +40,6 @@ KNOWLEDGE_LIBRARY = ListSpec(
 manifest = ModuleManifest(
     name="knowledge",
     version="0.1.0",
-    required_roles=("member",),
     locale_package="campus_agent_knowledge",
     prompt_fragments=("prompt.knowledge",),
     lists=(KNOWLEDGE_LIBRARY,),
@@ -48,7 +48,7 @@ manifest = ModuleManifest(
         ToolSpec(
             name="search_knowledge",
             tool_class=ToolClass.READ,
-            min_role="member",
+            min_role=BASE_SLOT,
             input_model=tools.SearchKnowledgeInput,
             handler=tools.search_knowledge,
         ),

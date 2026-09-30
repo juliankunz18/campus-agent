@@ -78,6 +78,10 @@ class AgentLimits(_Strict):
 
 
 class ApplicationsConfig(_Strict):
+    approver_role: Slug | None = Field(
+        default=None,
+        description="Role that decides on applications; defaults to the highest role.",
+    )
     clarification_deadline: timedelta = Field(
         default=DEFAULT_CLARIFICATION_DEADLINE, gt=timedelta(0)
     )

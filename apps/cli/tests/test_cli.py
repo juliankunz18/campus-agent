@@ -65,6 +65,10 @@ class TestDoctor:
         assert "[ok]   configuration" in result.output
         assert "[ok]   roles: member < team_lead < board" in result.output
         assert "[ok]   tools and texts: 24 tools" in result.output
+        assert (
+            "[ok]   role slots: activity_confirmer=team_lead, approver=board, base=member, "
+            "member_admin=board, organizer=board"
+        ) in result.output
         assert "[skip] Graph permissions" in result.output
 
     def test_reports_missing_variables(self):

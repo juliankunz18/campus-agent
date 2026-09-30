@@ -16,12 +16,16 @@ from campus_agent_core.errors import (
     ValidationFailedError,
 )
 from campus_agent_core.ports.module import (
+    APPROVER_SLOT,
+    BASE_SLOT,
     ColumnType,
+    DefaultRole,
     ListColumn,
     ListKind,
     ListSpec,
     ModuleManifest,
     RoleRef,
+    RoleSlot,
     ToolClass,
     ToolContext,
     ToolHandler,
@@ -31,9 +35,12 @@ from campus_agent_core.ports.module import (
 )
 
 __all__ = [
+    "APPROVER_SLOT",
+    "BASE_SLOT",
     "CampusAgentError",
     "ColumnType",
     "ConflictError",
+    "DefaultRole",
     "ErrorCode",
     "ForbiddenError",
     "InvalidStateError",
@@ -43,6 +50,7 @@ __all__ = [
     "ModuleManifest",
     "NotFoundError",
     "RoleRef",
+    "RoleSlot",
     "ToolClass",
     "ToolContext",
     "ToolHandler",

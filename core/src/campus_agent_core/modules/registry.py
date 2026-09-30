@@ -25,6 +25,8 @@ class RegisteredTool:
     module: str
     description: str
     parameters: dict[str, JsonValue]
+    min_role: str
+    """Configured role ID the tool's role slot resolved to."""
 
     @property
     def name(self) -> str:
@@ -35,7 +37,7 @@ class RegisteredTool:
         return self.spec.tool_class
 
     @property
-    def min_role(self) -> str:
+    def role_slot(self) -> str:
         return self.spec.min_role
 
     def schema(self) -> ToolSchema:
@@ -54,12 +56,19 @@ class ToolRegistry:
             for spec in module.manifest.tools:
                 if spec.name in self._tools:
                     raise ValueError(f"duplicate tool name {spec.name!r}")
-                roles.rank(spec.min_role)  # unknown roles fail early
+                try:
+                    min_role = module.slot_roles[spec.min_role]
+                except KeyError:
+                    raise ValueError(
+                        f"role slot {spec.min_role!r} of tool {spec.name!r} is not resolved"
+                    ) from None
+                roles.rank(min_role)  # unknown roles fail early
                 self._tools[spec.name] = RegisteredTool(
                     spec=spec,
                     module=module.name,
                     description=module.catalog.get(spec.description_key, language),
                     parameters=_localized_schema(spec, module.catalog, language),
+                    min_role=min_role,
                 )
 
     @property

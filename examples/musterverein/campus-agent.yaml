@@ -36,16 +36,21 @@ agent:
   pending_action_ttl: PT24H
   tool_result_max_tokens: 4000
 
+# Role slots map functions to your roles (ADR 0019). All of them are optional; the
+# values below are the defaults for this hierarchy. Privileged slots can never be the
+# lowest role.
 applications:
+  approver_role: board          # decides on applications (default: highest role)
   clarification_deadline: P30D
 
 modules:
-  members: {}
+  members:
+    admin_role: board           # searches and changes member data (default: approver)
   certificates:
-    approver_role: board
+    confirmer_role: team_lead   # confirms team activities (default: second-lowest role)
     template: templates/bescheinigung.html.j2
     number_format: "MUSTER-{year}-{seq:03d}"
   knowledge:
     library: Wissen
   events:
-    organizer_role: board
+    organizer_role: board       # creates events, sees participants (default: approver)

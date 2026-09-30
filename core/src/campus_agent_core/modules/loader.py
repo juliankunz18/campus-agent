@@ -11,7 +11,8 @@ from pydantic import BaseModel, JsonValue, ValidationError
 from campus_agent_core.config.errors import format_location
 from campus_agent_core.config.schema import CampusAgentConfig
 from campus_agent_core.i18n import SUPPORTED_LANGUAGES, Catalog, CatalogError, load_catalog
-from campus_agent_core.ports.module import ROLES_CONTEXT_KEY, ModuleManifest
+from campus_agent_core.modules.slots import resolve_slots
+from campus_agent_core.ports.module import CORE_SLOTS, ROLES_CONTEXT_KEY, ModuleManifest
 
 ENTRY_POINT_GROUP = "campus_agent.modules"
 CORE_MODULE = "core"
@@ -34,6 +35,8 @@ class LoadedModule:
     catalog: Catalog
     settings: BaseModel | None = None
     raw_settings: Mapping[str, JsonValue] = field(default_factory=dict[str, JsonValue])
+    slot_roles: Mapping[str, str] = field(default_factory=dict[str, str])
+    """Role ID per role slot usable by this module (own slots and core slots)."""
 
     @property
     def name(self) -> str:
@@ -73,12 +76,17 @@ def load_modules(
     *,
     catalog_loader: Callable[[str], Catalog] = load_catalog,
 ) -> list[LoadedModule]:
-    """Validate and return the core module plus every module enabled in the config."""
-    roles = config.role_hierarchy().roles
+    """Validate and return the core module plus every module enabled in the config.
+
+    Role slots are resolved here: first the core slots, then each module's own slots.
+    """
+    hierarchy = config.role_hierarchy()
+    roles = hierarchy.roles
     names = [CORE_MODULE, *(name for name in config.modules if name != CORE_MODULE)]
     issues: list[str] = []
     loaded: list[LoadedModule] = []
     tool_owner: dict[str, str] = {}
+    core_slots: dict[str, str] = {}
 
     for name in names:
         manifest = manifests.get(name)
@@ -86,12 +94,6 @@ def load_modules(
             available = ", ".join(sorted(manifests)) or "none"
             issues.append(f"modules.{name}: module is not installed (available: {available})")
             continue
-
-        missing_roles = [role for role in manifest.required_roles if role not in roles]
-        if missing_roles:
-            issues.append(
-                f"modules.{name}: needs roles that are not configured: {', '.join(missing_roles)}"
-            )
 
         for tool in manifest.tools:
             owner = tool_owner.setdefault(tool.name, name)
@@ -105,14 +107,29 @@ def load_modules(
             continue
         issues.extend(f"modules.{name}: {issue}" for issue in _missing_texts(manifest, catalog))
 
-        raw_settings = config.modules.get(name, {})
+        # The core is configured through the top-level "applications" section.
+        is_core = name == CORE_MODULE
+        prefix = "applications." if is_core else f"modules.{name}."
+        raw_settings = _core_settings(config) if is_core else config.modules.get(name, {})
         settings, settings_issues = _validate_settings(manifest, raw_settings, roles)
-        issues.extend(f"modules.{name}.{issue}" for issue in settings_issues)
-        loaded.append(LoadedModule(manifest, catalog, settings, raw_settings))
+        issues.extend(f"{prefix}{issue}" for issue in settings_issues)
+
+        slot_roles, slot_issues = resolve_slots(
+            manifest, raw_settings, hierarchy, inherited={} if is_core else core_slots
+        )
+        issues.extend(f"{prefix}{issue}" for issue in slot_issues)
+        if is_core:
+            core_slots = {slot: slot_roles[slot] for slot in CORE_SLOTS if slot in slot_roles}
+        loaded.append(LoadedModule(manifest, catalog, settings, raw_settings, slot_roles))
 
     if issues:
         raise ModuleLoadError(issues)
     return loaded
+
+
+def _core_settings(config: CampusAgentConfig) -> dict[str, JsonValue]:
+    approver = config.applications.approver_role
+    return {} if approver is None else {"approver_role": approver}
 
 
 def _call(factory: object) -> ModuleManifest | None:
