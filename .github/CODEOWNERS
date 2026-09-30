@@ -1,0 +1,8 @@
+# Maintainers review every change. Security-relevant paths are listed explicitly so that
+# additional maintainers can be added there first.
+*                                   @juliankunz18
+
+/core/src/campus_agent_core/domain/ @juliankunz18
+/core/src/campus_agent_core/agent/  @juliankunz18
+/apps/mcp/                          @juliankunz18
+/.github/                           @juliankunz18

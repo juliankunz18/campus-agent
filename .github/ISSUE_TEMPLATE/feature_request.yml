@@ -1,0 +1,34 @@
+name: Feature request
+description: Suggest an improvement to the core or an existing module.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Which task of your group is hard today? Who is affected (member, team lead, board)?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: What should campus-agent do? Which role may use it?
+    validations:
+      required: true
+  - type: dropdown
+    id: binding
+    attributes:
+      label: Does it change data?
+      description: Binding actions always need a confirmation card and, where applicable, the four-eyes principle.
+      options:
+        - "No, read only"
+        - "Creates a draft"
+        - "Yes, binding change"
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      description: Could this be a separate module instead of a core change?

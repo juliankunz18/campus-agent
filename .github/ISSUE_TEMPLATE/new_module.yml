@@ -1,0 +1,55 @@
+name: New module
+description: Propose a new module (for example cooperation events) without changing the core.
+labels: [module]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Modules register through the `campus_agent.modules` entry point, only import
+        `campus_agent_core.ports` and bring a manifest. See docs/module-development.md.
+  - type: input
+    id: name
+    attributes:
+      label: Module name
+      description: English, lower snake_case.
+      placeholder: cooperation_events
+    validations:
+      required: true
+  - type: textarea
+    id: purpose
+    attributes:
+      label: Purpose
+      description: Which use cases does it cover, and for which groups?
+    validations:
+      required: true
+  - type: textarea
+    id: tools
+    attributes:
+      label: Tools
+      description: One line per tool - name, class (read, draft, commit), minimum role, short purpose.
+      placeholder: |
+        list_partner_events | read | member | upcoming events with partner groups
+        propose_partner_event | draft | board | prepare an event proposal
+    validations:
+      required: true
+  - type: textarea
+    id: lists
+    attributes:
+      label: SharePoint lists
+      description: Lists or libraries with their main columns.
+  - type: textarea
+    id: data
+    attributes:
+      label: Personal data
+      description: Which personal data does the module process, and which fields reach the model?
+    validations:
+      required: true
+  - type: dropdown
+    id: location
+    attributes:
+      label: Where should it live?
+      options:
+        - In this repository
+        - As a separate package
+    validations:
+      required: true
