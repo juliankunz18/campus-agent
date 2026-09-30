@@ -1,0 +1,51 @@
+# campus-agent configuration of the fictional "Musterverein e.V.".
+# All tenant-specific IDs come from environment variables (see .env.example).
+# Copy this file with `campus-agent init` and adapt it for your group.
+
+group:
+  name: Musterverein e.V.
+  short_name: musterverein
+  language: de
+
+# Lowest role first; higher roles inherit everything below them.
+roles:
+  - id: member
+    label: Mitglied
+    source: all_tenant_users
+  - id: team_lead
+    label: Ressortleitung
+    entra_group: ${GROUP_TEAM_LEAD}
+  - id: board
+    label: Vorstand
+    entra_group: ${GROUP_BOARD}
+
+sharepoint:
+  site_id: ${SHAREPOINT_SITE_ID}
+
+llm:
+  deployment: ${AZURE_OPENAI_DEPLOYMENT}
+
+# Start values from the design; tune them during the pilot.
+agent:
+  max_tool_rounds: 6
+  llm_timeout: PT30S
+  history_max_messages: 10
+  history_max_age: PT24H
+  role_cache_ttl: PT5M
+  rate_limit_per_hour: 30
+  pending_action_ttl: PT24H
+  tool_result_max_tokens: 4000
+
+applications:
+  clarification_deadline: P30D
+
+modules:
+  members: {}
+  certificates:
+    approver_role: board
+    template: templates/bescheinigung.html.j2
+    number_format: "MUSTER-{year}-{seq:03d}"
+  knowledge:
+    library: Wissen
+  events:
+    organizer_role: board
