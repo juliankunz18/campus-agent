@@ -221,3 +221,11 @@ class TestRuntimeSettings:
 
         with pytest.raises(ValueError, match="DEV_FAKE_USER is only allowed"):
             RuntimeSettings()  # pyright: ignore[reportCallIssue]
+
+    def test_fake_role_refused_outside_local(self, monkeypatch: pytest.MonkeyPatch):
+        monkeypatch.setenv("CAMPUS_AGENT_ENV", "prod")
+        monkeypatch.delenv("DEV_FAKE_USER", raising=False)
+        monkeypatch.setenv("DEV_FAKE_ROLE", "board")
+
+        with pytest.raises(ValueError, match="DEV_FAKE_ROLE is only allowed"):
+            RuntimeSettings()  # pyright: ignore[reportCallIssue]
