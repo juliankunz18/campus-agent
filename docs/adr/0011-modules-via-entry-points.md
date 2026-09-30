@@ -22,5 +22,5 @@ core, and modules should be developable and testable without a tenant.
 
 * `campus-agent provision` creates the lists of all active modules; `doctor` checks the
   configuration.
-* Open question: module settings such as `organizer_role` are validated but do not yet
-  override the fixed minimum roles of the tool catalog.
+* Amended by [ADR 0019](0019-configurable-role-slots.md): `required_roles` declares role
+  slots, and tools name a slot instead of a role ID.

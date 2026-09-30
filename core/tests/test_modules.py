@@ -20,10 +20,12 @@ from campus_agent_core.modules import (
 from campus_agent_core.modules.builtin import manifest as core_manifest
 from campus_agent_core.ports import (
     ColumnType,
+    DefaultRole,
     ListColumn,
     ListSpec,
     ModuleManifest,
     RoleRef,
+    RoleSlot,
     ToolClass,
     ToolContext,
     ToolInput,
@@ -54,7 +56,7 @@ def make_tool(
     name: str = "search_things",
     *,
     tool_class: ToolClass = ToolClass.READ,
-    min_role: str = "member",
+    min_role: str = "base",
     input_model: type[ToolInput] = SearchInput,
 ) -> ToolSpec:
     return ToolSpec(
@@ -72,7 +74,10 @@ def make_manifest(
     data: dict[str, object] = {
         "name": name,
         "version": "1.0.0",
-        "required_roles": ("member", "team_lead", "board"),
+        "required_roles": (
+            RoleSlot(name="lead", default=DefaultRole.ABOVE_LOWEST),
+            RoleSlot(name="admin", inherits="approver"),
+        ),
         "locale_package": f"{name}_texts",
         "tools": (make_tool(),) if tools is None else tools,
     }
@@ -122,8 +127,8 @@ class TestToolSpec:
 
 class TestManifest:
     def test_tool_roles_must_be_declared(self):
-        with pytest.raises(ValidationError, match="missing from required_roles: board"):
-            make_manifest(tools=(make_tool(min_role="board"),), required_roles=("member",))
+        with pytest.raises(ValidationError, match="missing from required_roles: treasurer"):
+            make_manifest(tools=(make_tool(min_role="treasurer"),), required_roles=())
 
     def test_duplicate_tools(self):
         with pytest.raises(ValidationError, match="duplicate tool names: search_things"):
@@ -251,15 +256,6 @@ class TestLoadModules:
             "modules.missing: module is not installed (available: core)",
         )
 
-    def test_required_roles_must_be_configured(self):
-        demo = make_manifest(required_roles=("member", "treasurer"), tools=())
-        config = minimal_config("modules:\n  demo: {}\n")
-
-        with pytest.raises(ModuleLoadError, match="needs roles that are not configured: treasurer"):
-            load_modules(
-                config, {"core": core_manifest, "demo": demo}, catalog_loader=loader_for(demo)
-            )
-
     def test_every_text_must_exist_in_every_language(self):
         demo = make_manifest(prompt_fragments=("prompt.demo",))
         config = minimal_config("modules:\n  demo: {}\n")
@@ -280,7 +276,7 @@ class TestLoadModules:
         )
 
     def test_tool_names_are_unique_across_modules(self):
-        clash = make_manifest(tools=(make_tool("approve_application", min_role="board"),))
+        clash = make_manifest(tools=(make_tool("approve_application", min_role="approver"),))
         config = minimal_config("modules:\n  demo: {}\n")
 
         with pytest.raises(
@@ -335,9 +331,9 @@ def registry() -> ToolRegistry:
     demo = make_manifest(
         tools=(
             make_tool("search_things"),
-            make_tool("confirm_thing", tool_class=ToolClass.COMMIT, min_role="team_lead"),
+            make_tool("confirm_thing", tool_class=ToolClass.COMMIT, min_role="lead"),
             make_tool(
-                "delete_all", tool_class=ToolClass.COMMIT, min_role="board", input_model=EmptyInput
+                "delete_all", tool_class=ToolClass.COMMIT, min_role="admin", input_model=EmptyInput
             ),
         )
     )

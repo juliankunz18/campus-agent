@@ -107,7 +107,13 @@ class ToolSpec(BaseModel):
 
     name: str = Field(description="English snake_case name.")
     tool_class: ToolClass
-    min_role: str = Field(description="Lowest role allowed to use the tool.")
+    min_role: str = Field(
+        description=(
+            "Role slot of the lowest role allowed to use the tool: a core slot "
+            "('base', 'approver') or a slot declared in the module's required_roles. "
+            "The loader maps it to a configured role ID."
+        )
+    )
     input_model: type[ToolInput]
     handler: ToolHandler
 
@@ -208,6 +214,56 @@ class ListSpec(BaseModel):
         return self
 
 
+class DefaultRole(StrEnum):
+    """Position in the configured hierarchy used when a slot is not set explicitly."""
+
+    LOWEST = "lowest"
+    ABOVE_LOWEST = "above_lowest"
+    HIGHEST = "highest"
+
+
+BASE_SLOT = "base"
+"""Core slot: the lowest configured role (everybody in the tenant)."""
+
+APPROVER_SLOT = "approver"
+"""Core slot: who decides on applications (``applications.approver_role``)."""
+
+CORE_SLOTS = frozenset({BASE_SLOT, APPROVER_SLOT})
+
+
+class RoleSlot(BaseModel):
+    """A role a module needs, named by function instead of by role ID (ADR 0019).
+
+    Each group maps slots to its own roles: explicitly through ``setting`` in the
+    module's settings, otherwise through ``default`` (a position in the hierarchy) or
+    ``inherits`` (another slot). Privileged slots expose other people's data or trigger
+    binding actions for others and may never resolve to the lowest role.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    name: str
+    default: DefaultRole | None = None
+    inherits: str | None = None
+    privileged: bool = True
+    setting: str | None = Field(
+        default=None, description="Field of the module settings that overrides the slot."
+    )
+
+    @field_validator("name", "inherits", "setting")
+    @classmethod
+    def _snake_case(cls, value: str | None) -> str | None:
+        if value is not None and not SNAKE_CASE.fullmatch(value):
+            raise ValueError(f"{value!r} must be lower snake_case")
+        return value
+
+    @model_validator(mode="after")
+    def _one_default(self) -> Self:
+        if (self.default is None) == (self.inherits is None):
+            raise ValueError(f"slot {self.name!r}: set exactly one of 'default' or 'inherits'")
+        return self
+
+
 class ModuleManifest(BaseModel):
     """Everything the framework needs to know about a module."""
 
@@ -215,7 +271,10 @@ class ModuleManifest(BaseModel):
 
     name: str
     version: str
-    required_roles: tuple[str, ...] = Field(min_length=1)
+    required_roles: tuple[RoleSlot, ...] = Field(
+        default=(),
+        description="Role slots of this module; the core slots are always available.",
+    )
     lists: tuple[ListSpec, ...] = ()
     tools: tuple[ToolSpec, ...] = ()
     prompt_fragments: tuple[str, ...] = Field(
@@ -248,12 +307,33 @@ class ModuleManifest(BaseModel):
         duplicates = sorted({name for name in tool_names if tool_names.count(name) > 1})
         if duplicates:
             raise ValueError(f"duplicate tool names: {', '.join(duplicates)}")
-        undeclared = sorted(
-            {tool.min_role for tool in self.tools} - set(self.required_roles),
-        )
+        slot_names = [slot.name for slot in self.required_roles]
+        duplicate_slots = sorted({name for name in slot_names if slot_names.count(name) > 1})
+        if duplicate_slots:
+            raise ValueError(f"duplicate role slots: {', '.join(duplicate_slots)}")
+        redefined = sorted(CORE_SLOTS & set(slot_names))
+        if redefined and self.name != "core":
+            raise ValueError(f"core slots cannot be redeclared: {', '.join(redefined)}")
+        known = set(slot_names) | CORE_SLOTS
+        undeclared = sorted({tool.min_role for tool in self.tools} - known)
         if undeclared:
             raise ValueError(
-                f"tools use roles missing from required_roles: {', '.join(undeclared)}"
+                f"tools use role slots missing from required_roles: {', '.join(undeclared)}"
+            )
+        unknown_parents = sorted(
+            {slot.inherits for slot in self.required_roles if slot.inherits} - known
+        )
+        if unknown_parents:
+            raise ValueError(f"slots inherit unknown slots: {', '.join(unknown_parents)}")
+        settings_fields: set[str] = (
+            set(self.config_model.model_fields) if self.config_model else set()
+        )
+        missing_settings = sorted(
+            {slot.setting for slot in self.required_roles if slot.setting} - settings_fields
+        )
+        if missing_settings:
+            raise ValueError(
+                f"slot settings missing from config_model: {', '.join(missing_settings)}"
             )
         list_names = [spec.name for spec in self.lists]
         duplicate_lists = sorted({name for name in list_names if list_names.count(name) > 1})

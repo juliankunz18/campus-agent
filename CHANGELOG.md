@@ -9,6 +9,10 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Configurable role slots: tools name a function (`base`, `approver`, `member_admin`,
+  `activity_confirmer`, `organizer`) that each group maps to its own roles;
+  `applications.approver_role`, `members.admin_role`, `certificates.confirmer_role` and
+  `events.organizer_role` take effect, and `doctor` shows the mapping.
 - uv workspace with core, integrations, four modules (members, certificates, knowledge,
   events) and three apps (bot, MCP server, CLI).
 - Roles with inheritance from the configuration and role checks for tools.

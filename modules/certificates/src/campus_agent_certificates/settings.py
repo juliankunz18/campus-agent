@@ -4,15 +4,15 @@ from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from campus_agent_core.ports import RoleRef
-
 DEFAULT_TEMPLATE = "builtin:certificate.de.html.j2"
 
 
 class CertificatesSettings(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    approver_role: RoleRef = "board"
+    confirmer_role: str | None = None
+    """Role that confirms activities of its team; defaults to the second-lowest role."""
+
     template: str = Field(
         default=DEFAULT_TEMPLATE,
         description="Path relative to the configuration file, or the built-in template.",

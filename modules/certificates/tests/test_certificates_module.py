@@ -27,11 +27,20 @@ def test_number_format_needs_a_sequence():
         CertificatesSettings(number_format="{seq}-{unknown}")
 
 
-def test_approver_role_must_be_configured():
-    with pytest.raises(ValidationError, match="unknown role 'chair'"):
-        CertificatesSettings.model_validate(
-            {"approver_role": "chair"}, context={"roles": ("member", "board")}
-        )
+def test_activity_confirmation_uses_its_own_role_slot():
+    (slot,) = manifest.required_roles
+
+    assert slot.name == "activity_confirmer"
+    assert slot.setting == "confirmer_role"
+    assert slot.privileged
+    assert {t.min_role for t in manifest.tools if t.name.endswith("team_activities")} == {
+        "activity_confirmer"
+    }
+
+
+def test_approval_is_configured_in_the_core_not_here():
+    with pytest.raises(ValidationError, match="approver_role"):
+        CertificatesSettings.model_validate({"approver_role": "board"})
 
 
 def test_builtin_template_is_packaged():

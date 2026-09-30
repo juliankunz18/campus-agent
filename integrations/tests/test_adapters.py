@@ -65,9 +65,7 @@ class TestAzureOpenAIFormat:
 
 
 def module_with(name: str, *lists: ListSpec) -> LoadedModule:
-    manifest = ModuleManifest(
-        name=name, version="1.0.0", required_roles=("member",), locale_package="x", lists=lists
-    )
+    manifest = ModuleManifest(name=name, version="1.0.0", locale_package="x", lists=lists)
     return LoadedModule(manifest, catalog_for(manifest))
 
 

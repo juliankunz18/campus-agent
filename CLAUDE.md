@@ -57,6 +57,9 @@ All of these must be green before every commit.
 * **Identity**: no tool has a user ID or role parameter. The caller always comes from the
   verified request (`ToolContext.user`). Tool input models extend `ToolInput`
   (`extra="forbid"`).
+* **Roles**: tools name a role slot (`base`, `approver` or a slot declared in
+  `required_roles`), never a role ID; groups name their roles freely (ADR 0019).
+  Privileged slots never resolve to the lowest role.
 * **Binding actions** are `commit` tools and only run after card confirmation, never
   from the model.
 * **Language**: code, comments, docstrings in English. User-visible texts (tool and
