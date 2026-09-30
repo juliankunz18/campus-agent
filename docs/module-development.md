@@ -51,8 +51,10 @@ The entry point name must equal the manifest name.
 from pydantic import BaseModel, ConfigDict, Field
 
 from campus_agent_core.ports import (
+    APPROVER_SLOT,
+    BASE_SLOT,
     ModuleManifest,
-    RoleRef,
+    RoleSlot,
     ToolClass,
     ToolContext,
     ToolInput,
@@ -72,13 +74,16 @@ async def list_things(context: ToolContext, params: ListThingsInput) -> ToolResu
 
 class ExampleSettings(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
-    owner_role: RoleRef = "board"  # checked against the configured roles
+    owner_role: str | None = None  # overrides the "owner" role slot
 
 
 manifest = ModuleManifest(
     name="example",
     version="0.1.0",
-    required_roles=("member",),
+    required_roles=(
+        # Privileged by default: may never resolve to the lowest role.
+        RoleSlot(name="owner", inherits=APPROVER_SLOT, setting="owner_role"),
+    ),
     locale_package="campus_agent_example",
     prompt_fragments=("prompt.example",),
     config_model=ExampleSettings,
@@ -86,13 +91,28 @@ manifest = ModuleManifest(
         ToolSpec(
             name="list_things",
             tool_class=ToolClass.READ,
-            min_role="member",
+            min_role=BASE_SLOT,  # everybody; use "owner" for privileged tools
             input_model=ListThingsInput,
             handler=list_things,
         ),
     ),
 )
 ```
+
+## Role slots
+
+Tools never name role IDs, because every group names its roles differently. A tool's
+`min_role` is a role slot (ADR 0019):
+
+* core slots, always available: `base` (lowest role) and `approver` (decides on
+  applications, `applications.approver_role`, default: highest role);
+* own slots, declared in `required_roles` with either `default` (`lowest`,
+  `above_lowest`, `highest`) or `inherits` (another slot), and optionally a `setting`
+  field of the module settings that overrides it.
+
+Slots are privileged unless declared with `privileged=False`. Use privileged slots for
+every tool that shows other people's data or acts for others; the loader refuses to map
+them to the lowest role. `campus-agent doctor` prints the resulting mapping.
 
 Declare SharePoint lists with `ListSpec` and `ListColumn`; `campus-agent provision`
 creates them in dependency order (lookup targets first).

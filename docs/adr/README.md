@@ -24,3 +24,4 @@ supersedes the old one, never by rewriting history.
 | [0016](0016-german-first-translatable-texts.md) | German first, translatable texts | Accepted |
 | [0017](0017-bm25-knowledge-search.md) | Keyword search (BM25) for knowledge in the MVP | Accepted |
 | [0018](0018-apache-license-and-dco.md) | Apache License 2.0 and DCO instead of a CLA | Accepted |
+| [0019](0019-configurable-role-slots.md) | Configurable role slots | Accepted |

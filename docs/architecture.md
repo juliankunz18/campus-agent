@@ -40,6 +40,22 @@ flowchart LR
   InMemoryStorage, InMemoryApplicationRepository) serve tests and local development.
 * Bot and MCP server never import each other.
 
+## Roles and role slots
+
+Roles are configured per group from lowest to highest; higher roles inherit everything
+below them. Tools do not name role IDs but **role slots** that the loader maps to the
+group's roles at start (ADR 0019):
+
+| Slot | Default | Setting | Used for |
+|---|---|---|---|
+| `base` | lowest role | - | member tools |
+| `approver` | highest role | `applications.approver_role` | decisions on applications |
+| `member_admin` | `approver` | `modules.members.admin_role` | searching and changing member data |
+| `activity_confirmer` | second-lowest role | `modules.certificates.confirmer_role` | confirming team activities |
+| `organizer` | `approver` | `modules.events.organizer_role` | creating events, participant lists |
+
+Privileged slots (all except `base`) can never be mapped to the lowest role.
+
 ## Agent cycle
 
 ```mermaid

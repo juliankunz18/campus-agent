@@ -29,3 +29,5 @@ are shipped by a built-in `core` module registered like any other module.
 
 * Rules are not configurable and cannot be switched off.
 * Corrections to decided applications always need a new application.
+* Amended by [ADR 0019](0019-configurable-role-slots.md): who decides is the `approver`
+  role slot (`applications.approver_role`, default: highest role).
