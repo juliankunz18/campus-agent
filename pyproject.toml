@@ -48,7 +48,7 @@ target-version = "py312"
 extend-exclude = ["infra"]
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "N", "UP", "B", "SIM", "RUF", "ASYNC", "PT", "C4", "PIE", "RET"]
+select = ["E", "F", "W", "I", "N", "UP", "B", "SIM", "RUF", "ASYNC", "PT", "C4", "PIE", "RET", "DTZ"]
 
 [tool.ruff.lint.isort]
 known-first-party = [
