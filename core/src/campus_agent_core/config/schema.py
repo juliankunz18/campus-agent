@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from datetime import timedelta
 from enum import StrEnum
 from typing import Annotated, Literal, Self
@@ -115,3 +116,18 @@ class CampusAgentConfig(_Strict):
 
     def role_hierarchy(self) -> RoleHierarchy:
         return RoleHierarchy([role.id for role in self.roles])
+
+    def role_for_groups(self, group_ids: Iterable[str]) -> str:
+        """Highest role whose Entra group the user belongs to; the lowest role otherwise.
+
+        Every user of the tenant has the lowest role (``source: all_tenant_users``).
+        """
+        memberships = set(group_ids)
+        granted = [role.id for role in self.roles if role.entra_group in memberships]
+        return self.role_hierarchy().highest_of(granted) or self.roles[0].id
+
+    def role_label(self, role_id: str) -> str:
+        for role in self.roles:
+            if role.id == role_id:
+                return role.label
+        raise KeyError(role_id)

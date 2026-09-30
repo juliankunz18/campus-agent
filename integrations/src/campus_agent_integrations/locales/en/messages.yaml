@@ -1,0 +1,6 @@
+cards:
+  confirm:
+    title: Please confirm
+    confirm: Confirm
+    cancel: Cancel
+    expires: Valid until {expires}.

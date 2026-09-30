@@ -9,7 +9,7 @@ dependencies = [
     "campus-agent-core",
     "azure-data-tables==12.7.0",
     "azure-identity==1.25.3",
-    "microsoft-agents-hosting-teams==1.7.0",
+    "microsoft-agents-hosting-msteams==1.7.0",
     "msgraph-sdk==1.63.0",
     "openai==3.22.1",
 ]

@@ -99,6 +99,21 @@ class TestSchema:
         assert config.applications.clarification_deadline == timedelta(days=30)
         assert config.modules == {}
 
+    @pytest.mark.parametrize(
+        ("groups", "role"),
+        [
+            ([], "member"),
+            (["unrelated"], "member"),
+            (["group-1"], "board"),
+            (["unrelated", "group-1"], "board"),
+        ],
+    )
+    def test_role_for_groups(self, groups: list[str], role: str):
+        config = parse_config(VALID, env=ENV)
+
+        assert config.role_for_groups(groups) == role
+        assert config.role_label(role) in {"Mitglied", "Vorstand"}
+
     def test_role_hierarchy_follows_configured_order(self):
         config = parse_config(VALID, env=ENV)
 
