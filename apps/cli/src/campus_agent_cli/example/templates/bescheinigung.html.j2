@@ -1,0 +1,31 @@
+{#- Certificate template of the fictional Musterverein. Rendered with Jinja2 + WeasyPrint.
+    Only data from the approved application reaches this template; the model never writes it. -#}
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Engagementbescheinigung {{ number }}</title>
+  <style>
+    body { font-family: sans-serif; margin: 2.5cm; }
+    h1 { font-size: 1.6em; }
+    table { border-collapse: collapse; width: 100%; }
+    td, th { border-bottom: 1px solid #ccc; padding: 0.3em; text-align: left; }
+  </style>
+</head>
+<body>
+  <p>{{ group.name }}</p>
+  <h1>Engagementbescheinigung</h1>
+  <p>Nr. {{ number }} &middot; ausgestellt am {{ issued_on }}</p>
+  <p>Hiermit bestätigen wir, dass {{ member.name }} im Zeitraum vom {{ period.start }}
+     bis {{ period.end }} ehrenamtlich im {{ group.name }} tätig war.</p>
+  <table>
+    <thead><tr><th>Tätigkeit</th><th>Zeitraum</th></tr></thead>
+    <tbody>
+    {%- for activity in activities %}
+      <tr><td>{{ activity.title }}</td><td>{{ activity.start }} – {{ activity.end }}</td></tr>
+    {%- endfor %}
+    </tbody>
+  </table>
+  <p>Für den Vorstand: {{ approver.name }}</p>
+</body>
+</html>
