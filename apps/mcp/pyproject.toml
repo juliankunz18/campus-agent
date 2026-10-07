@@ -12,7 +12,7 @@ dependencies = [
     "campus-agent-certificates",
     "campus-agent-knowledge",
     "campus-agent-events",
-    "mcp==2.2.0",
+    "mcp==2.3.0",
     "uvicorn==0.54.0",
 ]
 
