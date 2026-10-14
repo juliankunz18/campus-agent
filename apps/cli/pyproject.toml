@@ -8,7 +8,7 @@ authors = [{ name = "Julian Kunz and contributors" }]
 dependencies = [
     "campus-agent-core",
     "campus-agent-integrations",
-    "typer==0.27.2",
+    "typer==0.27.3",
 ]
 
 [project.scripts]
