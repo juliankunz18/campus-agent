@@ -12,7 +12,7 @@ dependencies = [
     "campus-agent-certificates",
     "campus-agent-knowledge",
     "campus-agent-events",
-    "aiohttp==3.14.3",
+    "aiohttp==3.14.5",
     "microsoft-agents-authentication-msal==1.7.0",
     "microsoft-agents-hosting-aiohttp==1.7.0",
 ]
