@@ -4,7 +4,7 @@
 
 ARG PYTHON_IMAGE=python:3.12-slim-bookworm
 
-FROM ghcr.io/astral-sh/uv:0.12.21 AS uv
+FROM ghcr.io/astral-sh/uv:0.13.4 AS uv
 
 # --- build stage: resolve and install into /app/.venv --------------------------------
 FROM ${PYTHON_IMAGE} AS builder
