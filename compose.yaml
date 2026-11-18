@@ -49,7 +49,7 @@ services:
       - "127.0.0.1:8000:8000"
 
   azurite:
-    image: mcr.microsoft.com/azure-storage/azurite:3.37.0
+    image: mcr.microsoft.com/azure-storage/azurite:3.38.0
     command: ["azurite-table", "--tableHost", "0.0.0.0", "--tablePort", "10002", "--location", "/data"]
     volumes:
       - azurite-data:/data
